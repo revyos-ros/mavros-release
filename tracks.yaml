@@ -1,4 +1,4 @@
-release_repo_url: git@github.com:revyos-ros/mavros-release
+release_repo_url: git@github.com:revyos-ros/mavros-release.git
 tracks:
   foxy:
     actions:
