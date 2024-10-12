@@ -11,11 +11,11 @@ import struct
 import typing
 
 import rclpy.time
+from builtin_interfaces.msg import Time
+from mavros_msgs.msg import Mavlink
 from pymavlink import mavutil
 from pymavlink.generator.mavcrc import x25crc  # noqa F401
 from std_msgs.msg import Header
-from builtin_interfaces.msg import Time
-from mavros_msgs.msg import Mavlink
 
 from .utils import system_now
 
@@ -121,12 +121,13 @@ def convert_to_rosmsg(
             len=hdr.mlen,
             incompat_flags=hdr.incompat_flags,
             compat_flags=hdr.compat_flags,
+            seq=mavmsg.get_seq(),
             sysid=hdr.srcSystem,
             compid=hdr.srcComponent,
             msgid=hdr.msgId,
             checksum=mavmsg.get_crc(),
             payload64=convert_to_payload64(mavmsg.get_payload()),
-            signature=None,  # FIXME #569
+            signature=[],  # FIXME #569
         )
 
     else:

@@ -78,6 +78,13 @@ if(rclcpp_VERSION VERSION_LESS 9.0.0)
   )
 endif()
 
+if(rclcpp_VERSION VERSION_LESS 17.0.0)
+  # Humble and older
+  add_definitions(
+    -DUSE_OLD_RMW_QOS
+  )
+endif()
+
 # [[[cog:
 # import mavros_cog
 # ]]]
@@ -224,6 +231,9 @@ if(BUILD_TESTING)
   # list(APPEND ament_cmake_cppcheck_ADDITIONAL_INCLUDE_DIRS "${GTEST_INCLUDE_DIRS}")
   # list(APPEND ament_cmake_cppcheck_ADDITIONAL_INCLUDE_DIRS "${EIGEN3_INCLUDE_DIRS}")
   # set(ament_cmake_cppcheck_LANGUAGE "c++")
+
+  # NOTE(vooon): i prefer black style, which uses double quotes
+  set(ament_cmake_flake8_CONFIG_FILE "./setup.cfg")
 
   # NOTE(vooon): tired to provide more and more macro
   list(APPEND ament_cmake_cppcheck_ADDITIONAL_EXCLUDE "./test/*.cpp")
