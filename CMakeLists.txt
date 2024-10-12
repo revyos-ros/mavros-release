@@ -32,7 +32,6 @@ find_package(libmavconn REQUIRED)
 
 find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3 REQUIRED)
-# find_package(yaml_cpp REQUIRED)
 find_package(yaml_cpp_vendor REQUIRED)
 
 ## Find GeographicLib
@@ -77,6 +76,12 @@ if(rclcpp_VERSION VERSION_LESS 9.0.0)
   )
 endif()
 
+if(rclcpp_VERSION VERSION_LESS 17.0.0)
+  # Humble and older
+  add_definitions(
+    -DUSE_OLD_RMW_QOS
+  )
+endif()
 
 # [[[cog:
 # import mavros_cog
@@ -98,6 +103,7 @@ add_library(mavros_extras_plugins SHARED
   src/plugins/esc_status.cpp
   src/plugins/esc_telemetry.cpp
   src/plugins/fake_gps.cpp
+  src/plugins/gimbal_control.cpp
   src/plugins/gps_input.cpp
   src/plugins/gps_rtk.cpp
   src/plugins/gps_status.cpp
@@ -123,7 +129,7 @@ add_library(mavros_extras_plugins SHARED
   src/plugins/vision_pose_estimate.cpp
   src/plugins/vision_speed_estimate.cpp
   src/plugins/wheel_odometry.cpp
-  # [[[end]]] (checksum: e9b770ce685f15417fe9a859f1157b88)
+  # [[[end]]] (checksum: 1f8cd51fa90b89b27ee35d276b5f8c83)
 )
 ament_target_dependencies(mavros_extras_plugins
   angles
@@ -168,6 +174,13 @@ ament_target_dependencies(mavros_extras
   urdf
 )
 rclcpp_components_register_node(mavros_extras PLUGIN "mavros::extras::ServoStatePublisher" EXECUTABLE servo_state_publisher)
+
+# yaml-cpp is required for Jazzy and newer
+if(rclcpp_VERSION VERSION_GREATER_EQUAL 22.0.0)
+  find_package(yaml-cpp REQUIRED)
+  target_link_libraries(mavros_extras_plugins yaml-cpp::yaml-cpp)
+  target_link_libraries(mavros_extras yaml-cpp::yaml-cpp)
+endif()
 
 install(TARGETS mavros_extras mavros_extras_plugins
   EXPORT export_${PROJECT_NAME}
